@@ -32,6 +32,14 @@
 </p>
 <% end %>
 
+<%= render 'search_experts_form', user: @user %>
+
+<br/>
+
+<%=show_connection(@user, @experts)%>
+
+<br/>
+
 
 <%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>

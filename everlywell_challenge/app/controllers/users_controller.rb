@@ -14,6 +14,7 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
+    @experts = User.search(@user, params[:search])
   end
 
   # GET /users/new

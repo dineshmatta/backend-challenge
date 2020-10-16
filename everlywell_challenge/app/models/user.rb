@@ -52,6 +52,48 @@ class User < ApplicationRecord
     where.not(id: user)
   end
 
+  def self.search(user, search)
+    if search
+      # Get searching users friendships
+      user_friends = user.friends
+      user_hash = {}
+
+      user_friends.each do |user_friend| # dineshOutlook
+        user_friend.friends.each do |friend| ## dineshrediff Dinesh
+          if !user.friend_with?(friend) && user.id != friend.id
+            expert_link = self.find_expert(friend, user_friend, search)
+            return expert_link.length > 0 ? expert_link : []
+          end
+        end
+      end
+
+    end
+  end
+
+  def self.find_expert(friend, parent_friend, search)
+    match_found = false
+    expert_user_connection = []
+
+    unless friend.content
+      return nil
+    end
+
+    if friend.content && friend.content.match(search)
+      match_found = true
+      expert_user_connection.push(parent_friend.name)
+      expert_user_connection.push(friend.name)
+      return expert_user_connection
+    elsif friend.friends.length > 0
+      friend.friends.each do |frnd|
+        if frnd.id != parent_friend.id && !match_found
+          return self.find_expert(frnd, friend, search)
+        end
+      end
+    end
+
+    return expert_user_connection
+  end
+
   private
 
   def init_bitly
