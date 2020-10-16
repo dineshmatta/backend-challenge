@@ -15,22 +15,15 @@ class User < ApplicationRecord
 
   def fetch_profile
     begin
-      logger.info '****bitlyClient short url***'
-      logger.info @bitlyClient
-      # Rails.application.credentials.dig(:bitly_api_token)
-      # uri = Addressable::URI.parse(website)
-      # url = "http://#{website}" if(!uri.scheme)
-      #Setp1 - Fetch and Parse website page
+      #step 1- Get the document using Nokogiri
       document = Nokogiri::HTML.parse(open(website_url))
-      # update(:website => {:h1 => document.h1, :h2 => document.h2, :h3 => document.h3} )
-      ## step 2 - Extract content from website - h1, h2 and h3 tags
+
+      # step 2 - Extract h1-h3 tags
       contentHtml = document.css('h1, h2, h3').map(&:text).join("<br/>") if document;
 
-      ## step 3 - shorten the url
+      # step 3 - short the URL using bitly
       bitlink = @bitlyClient.shorten(long_url: website_url)
-      logger.info '****logging short url***'
-      logger.info bitlink.link
-
+    
       update(:content => contentHtml, :short_url => bitlink.link) if contentHtml
     rescue StandardError => e
       puts "Rescued: #{e.inspect}"
