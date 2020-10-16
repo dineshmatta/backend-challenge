@@ -25,5 +25,13 @@
   <%= @user.content %>
 </p>
 
+<% @user.friends.each_with_index do |user, index| %>
+<p>
+  <strong>Friend <%= index + 1 %></strong>
+  <%= link_to "#{user.name}", user %>
+</p>
+<% end %>
+
+
 <%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>
