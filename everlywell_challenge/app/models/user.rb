@@ -12,9 +12,17 @@ class User < ApplicationRecord
   after_save :fetch_profile, if: :website_url
   before_save :init_bitly
 
+  scope :friend_with, ->( other ) do
+    other = other.id if other.is_a?( User )
+    joins(:friendships).where( '(friendships.user_id = users.id AND friendships.friend_id = ?) OR (friendships.user_id = ? AND friendships.friend_id = users.id)', other, other ).includes( :frienships )
+  end
+
+  def friend_with?( other )
+    User.where( id: id ).friend_with( other ).any?
+  end
+
   def befriend(user)
-    logger.info "checking if association is alreayd present *** #{self.friends.length}"
-    if self.friends.length === 0
+    unless self.friend_with?(user)
       self.friends << user
       user.friends << self
     else
@@ -37,6 +45,11 @@ class User < ApplicationRecord
     rescue StandardError => e
       puts "Rescued: #{e.inspect}"
     end
+  end
+
+  ## Class methods
+  def self.all_except(user)
+    where.not(id: user)
   end
 
   private
